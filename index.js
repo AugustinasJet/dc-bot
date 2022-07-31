@@ -11,7 +11,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 client.once('ready', () => {
 	console.log('Ready!', new Date().toLocaleString());
 	const cronjob = new cron.CronJob(
-		'0 0 10,22 * * *',
+		'0 0 1,13 * * *',
 		async () => {
 			const user = client.users.fetch(process.env.DISCORD_RECIEVER_ID);
 			(await user).send('Laikas vaistukam');
