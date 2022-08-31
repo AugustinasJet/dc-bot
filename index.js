@@ -1,5 +1,5 @@
 // Require the necessary discord.js classes
-const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 require('dotenv').config();
 const cron = require('cron');
 const Airtable = require('airtable');
@@ -44,7 +44,7 @@ client.on('interactionCreate', async interaction => {
 				console.log(record.getId());
 			});
 		});
-		await interaction.reply('Ačiū!');
+		await interaction.update({ content: 'Ačiū!', components: [] });
 	}
 	if (!interaction.isChatInputCommand()) return;
 
