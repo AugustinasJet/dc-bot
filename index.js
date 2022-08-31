@@ -1,8 +1,9 @@
 // Require the necessary discord.js classes
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 require('dotenv').config();
 const cron = require('cron');
-
+const Airtable = require('airtable');
+const base = new Airtable({ apiKey: process.env.AIRTABLE_API_TOKEN }).base('appMym8genVACdBko');
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -14,12 +15,37 @@ client.once('ready', () => {
 		'0 0 7,19 * * *',
 		async () => {
 			const user = client.users.fetch(process.env.DISCORD_RECIEVER_ID);
-			(await user).send('Laikas vaistukam');
+			const row = new ActionRowBuilder()
+				.addComponents(
+					new ButtonBuilder()
+						.setCustomId('primary')
+						.setLabel('Išgėriau!')
+						.setStyle(ButtonStyle.Primary),
+				);
+			(await user).send({ content: 'Paspausk kai išgersi vaistus', components: [row] });
 		});
 	cronjob.start();
 });
 
 client.on('interactionCreate', async interaction => {
+	if (interaction.isButton() && interaction.customId == 'primary') {
+		base('drug').create([
+			{
+				'fields': {
+					'Date': new Date().toLocaleString(),
+				},
+			},
+		], function(err, records) {
+			if (err) {
+				console.error(err);
+				return;
+			}
+			records.forEach(function(record) {
+				console.log(record.getId());
+			});
+		});
+		await interaction.reply('Ačiū!');
+	}
 	if (!interaction.isChatInputCommand()) return;
 
 	const { commandName } = interaction;
@@ -35,14 +61,5 @@ client.on('interactionCreate', async interaction => {
 	}
 });
 
-// client.on('message');
-// cronjob
-
 // Login to Discord with your client's token
 client.login(process.env.DISCORD_TOKEN);
-
-
-// const scheduledMessage = new cron.CronJob('* * * * * *', () => {
-// 	(await user).send('Laikas vaistukam')
-// });
-// scheduledMessage.start();
